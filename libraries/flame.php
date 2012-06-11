@@ -14,11 +14,11 @@ class Flame
 	function __construct()
 	{
 		$this->ci = &get_instance();
-		$this->ci->load->helper( array('html', 'inflector') );
+		$this->ci->load->database();
+		$this->ci->load->helper( array('html', 'inflector', 'url') );		
 		$this->ci->load->config('flame', TRUE, TRUE);
 		
-		$this->config = $this->ci->config->item('flame');
-		
+		$this->config = $this->ci->config->item('flame');				
 		if (isset($this->ci->session))
 		{
 			$this->messages = $this->ci->session->userdata('flame-messages');
