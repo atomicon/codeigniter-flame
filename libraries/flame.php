@@ -38,7 +38,7 @@ class Flame
 		}
 	}
 
-	function action($default = 'listing')
+	function action($default = 'page')
 	{
 		$action = $this->ci->uri->segment($this->config['uri_segment']);		
 		$action = $action ? $action : $default;
@@ -75,7 +75,7 @@ class Flame
 		echo $result;
 	}
 
-	function listing()
+	function page()
 	{
 		$result = '';
 		$this->ci->load->library('pagination');
@@ -95,7 +95,7 @@ class Flame
 
 		$result .= $this->ci->table->generate($rows);
 
-		$this->config['pagination']['base_url'] = $this->_base_url() .'listing/';
+		$this->config['pagination']['base_url'] = $this->_base_url() .'page/';
 		
 		$this->config['pagination']['uri_segment'] = $this->config['uri_segment']+1;
 
@@ -197,12 +197,12 @@ class Flame
 		}
 		
 		$suffix = '';
-		if ($this->ci->uri->segment($this->config['uri_segment']+2) == 'listing')
+		if ($this->ci->uri->segment($this->config['uri_segment']+2) == 'page')
 		{
 			$page = (int)$this->ci->uri->segment($this->config['uri_segment']+3);
 			if ($page>1)
 			{
-				$suffix = 'listing/'.$page;
+				$suffix = 'page/'.$page;
 			}
 		}
 		
@@ -280,7 +280,7 @@ class Flame
 			if ($primary_key_value && ($this->config['edit'] || $this->config['delete']))
 			{
 				$cur_page = $this->_current_page();
-				$suffix = $cur_page > 1 ? ('/listing/'.$cur_page) : '';
+				$suffix = $cur_page > 1 ? ('/page/'.$cur_page) : '';
 
 				$actions = '';
 				if ($this->config['edit'])
@@ -355,12 +355,12 @@ class Flame
 		}
 
 		$suffix = '';
-		if ($this->ci->uri->segment($this->config['uri_segment']+2) == 'listing')
+		if ($this->ci->uri->segment($this->config['uri_segment']+2) == 'page')
 		{
 			$page = (int)$this->ci->uri->segment($this->config['uri_segment']+3);
 			if ($page>1)
 			{
-				$suffix = 'listing/'.$page;
+				$suffix = 'page/'.$page;
 			}
 		}
 
