@@ -145,6 +145,11 @@ class Flame
 			</div>
 			';
 		}
+		
+		if ($this->config['page_title'])
+		{
+			$result .= '</div>';
+		}
 
 		return $result;
 	}
@@ -486,7 +491,7 @@ class Flame
 			{
 				$title = $this->config['page_title'];
 			}
-			$result = '<div class="page-header">' . heading($title, 1) . '</div>' . $result;
+			$result = '<div class="page-header">' . heading($title, 1) . '</div>' . $result . '</div>';
 		}
 
 		return $result;
