@@ -13,17 +13,17 @@ $config['rows']        = null;
 // Segment
 $config['uri_segment'] = 3;
 
-// Listing
-$config['sorting']     = FALSE;
+// Page
+$config['sorting']     = TRUE;
 $config['edit']		   = TRUE;
 $config['delete']	   = TRUE;
 
 // Form
 $config['form_open']   = TRUE;
 $config['form_close']  = TRUE;
-$config['form_attr']   = 'class="flame"';
+$config['form_attr']   = 'class="form"';
 
-// Form and Listing
+// Form and Page
 $config['page_title']  = TRUE;
 $config['show_actions']= TRUE;
 
@@ -74,7 +74,7 @@ $config['pagination'] = array(
 // Templates for objects
 $config['templates'] = array(
 	'table' => array(
-		'table_open' => '<table class="flame table table-bordered table-striped">',
+		'table_open' => '<table class="table table-bordered table-striped">',
 	),
 	'pagination' => array(
 		'pagination_open' => '<div class="pagination">',

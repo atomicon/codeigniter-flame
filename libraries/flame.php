@@ -134,7 +134,7 @@ class Flame
 			{
 				$title = $this->config['page_title'];
 			}
-			$result = '<div class="page-header">' . heading($title, 1) . '</div>' . $result;
+			$result = '<div class="page-header">' . "\n" . heading($title, 1) . "\n" . '</div>' . $result;
 		}
 
 		if ($this->config['show_actions'])
@@ -150,7 +150,9 @@ class Flame
 		{
 			$result .= '</div>';
 		}
-
+		
+		$result = "<div class=\"flame flame-page\">\n{$result}\n</div>";
+		
 		return $result;
 	}
 
@@ -493,6 +495,8 @@ class Flame
 			}
 			$result = '<div class="page-header">' . heading($title, 1) . '</div>' . $result . '</div>';
 		}
+		
+		$result = "<div class=\"flame flame-form\">\n{$result}\n</div>";		
 
 		return $result;
 	}
