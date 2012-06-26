@@ -1,24 +1,36 @@
 <?php
 
 if (!function_exists('_T')) {
+	/**
+	 * _T()
+	 * The _T function is actually for i18n
+	 * Create your own _T function and return the translations for translateable strings
+	 *
+	 * @param string $str
+	 * @return string
+	 */
 	function _T($str = '') { return $str; }
 }
 
 class Flame
 {
-	public $ci;
-	public $config = array();
-	
-	public $messages = array();
+	public $ci; //code igniter instance
+	public $config = array(); //the config
+	public $messages = array(); //messages
 
+	/**
+	 * Flame::__construct()
+	 *
+	 * @return
+	 */
 	function __construct()
 	{
 		$this->ci = &get_instance();
 		$this->ci->load->database();
-		$this->ci->load->helper( array('html', 'inflector', 'url') );		
+		$this->ci->load->helper( array('html', 'inflector', 'url') );
 		$this->ci->load->config('flame', TRUE, TRUE);
-		
-		$this->config = $this->ci->config->item('flame');				
+
+		$this->config = $this->ci->config->item('flame');
 		if (isset($this->ci->session))
 		{
 			$this->messages = $this->ci->session->userdata('flame-messages');
@@ -27,6 +39,16 @@ class Flame
 		$this->messages = is_array($this->messages) ? $this->messages : array();
 	}
 
+	/**
+	 * Flame::initialize()
+	 *
+	 * This fires up the flame. With an optional exta config array
+	 * e.g. often the 'table' will be set in the option array
+	 * The array will be merged with the default options
+	 *
+	 * @param mixed $config
+	 * @return
+	 */
 	function initialize($config = array())
 	{
 		$this->config = array_merge($this->config, $config);
@@ -38,13 +60,32 @@ class Flame
 		}
 	}
 
+	/**
+	 * Flame::action()
+	 *
+	 * This is a straight mapping from the url
+	 * e.g. you have a controller: Admin and a function Users the part after it
+	 * is the action(e.g. /admin/users/edit (edit is the action) )
+	 *
+	 * @param string $default (default = page)
+	 * @return string the current action (page/edit/create)
+	 */
 	function action($default = 'page')
 	{
-		$action = $this->ci->uri->segment($this->config['uri_segment']);		
+		$action = $this->ci->uri->segment($this->config['uri_segment']);
 		$action = $action ? $action : $default;
 		return $action;
 	}
 
+	/**
+	 * Flame::display()
+	 *
+	 * As the functions says... it displays the flame (an index page or a form)
+	 * This function also maps the current action to the corresponding function here.
+	 *
+	 * @param bool $return If false it will output to the screen right away
+	 * @return string or void
+	 */
 	function display($return = FALSE)
 	{
 		$result = '';
@@ -75,6 +116,16 @@ class Flame
 		echo $result;
 	}
 
+	/**
+	 * Flame::page()
+	 *
+	 * This is the page function
+	 * You'll see a page with all of your records
+	 * including pagination + edit / delete functionality (if given in the config)
+	 * You'll never have to call this function actually. It goes through display
+	 *
+	 * @return string The rendered html
+	 */
 	function page()
 	{
 		$result = '';
@@ -96,7 +147,7 @@ class Flame
 		$result .= $this->ci->table->generate($rows);
 
 		$this->config['pagination']['base_url'] = $this->_base_url() .'page/';
-		
+
 		$this->config['pagination']['uri_segment'] = $this->config['uri_segment']+1;
 
 		$this->ci->pagination->initialize($this->config['pagination']);
@@ -121,7 +172,7 @@ class Flame
 	 			$result .= $links;
 	 		}
 		}
-		
+
 		$result = $this->_show_messages() . $result;
 
 		if ($this->config['page_title'])
@@ -145,17 +196,24 @@ class Flame
 			</div>
 			';
 		}
-		
+
 		if ($this->config['page_title'])
 		{
 			$result .= '</div>';
 		}
-		
+
 		$result = "<div class=\"flame flame-page\">\n{$result}\n</div>";
-		
+
 		return $result;
 	}
 
+	/**
+	 * Flame::sort()
+	 *
+	 * If the action is sort it will translate the field with ASC or DESC
+	 *
+	 * @return void (redirect)
+	 */
 	function sort()
 	{
 		$sort_dir = $this->ci->uri->segment($this->config['uri_segment']+2);
@@ -165,22 +223,45 @@ class Flame
 		redirect( $this->_base_url() );
 	}
 
+	/**
+	 * Flame::create()
+	 *
+	 * The create action will instantiate an empty form
+	 *
+	 * @return string The rendered form
+	 */
 	function create()
 	{
 		return $this->_form();
 	}
 
+	/**
+	 * Flame::edit()
+	 *
+	 * This function will edit the current record
+	 * Note that it will use the primary key of the table to edit a record
+	 *
+	 * @return string The rendered form
+	 */
 	function edit()
 	{
 		$id = $this->ci->uri->segment($this->config['uri_segment']+1);
 		return $this->_form($id);
 	}
 
+	/**
+	 * Flame::delete()
+	 *
+	 * This function will delete a certain record
+	 * Note that it will use the primary key of the table to delete a record
+	 *
+	 * @return void (redirect)
+	 */
 	function delete()
 	{
 		$ok = FALSE;
 		$id = $this->ci->uri->segment($this->config['uri_segment']+1);
-						
+
 		if ($id)
 		{
 			$query = $this->ci->db->where($this->config['primary_key'], $id)->get($this->config['table']);
@@ -197,7 +278,7 @@ class Flame
 				}
 			}
 		}
-		
+
 		$suffix = '';
 		if ($this->ci->uri->segment($this->config['uri_segment']+2) == 'page')
 		{
@@ -207,10 +288,38 @@ class Flame
 				$suffix = 'page/'.$page;
 			}
 		}
-		
+
 		redirect( $this->_base_url() . $suffix );
 	}
 
+	/**
+	 * Flame::render_cell()
+	 *
+	 * This is a callback function (you specifiy it in the config with the initialize function)
+	 * If overridden you must decorate the cell yourself (this function applies only to the page function)
+	 *
+	 * Example:
+	 * <code>
+	 *
+	 * function my_render_cell($fieldname, $value, $flame)
+	 * {
+ 	 *   // is the field email?
+	 *   if($fieldname == 'email')
+	 *   {
+ 	 *      // create a nice mailto link
+     *      return mailto( $value );
+	 *   }
+	 *   // call original function
+	 *   return $flame->render_cell($fieldname, $value, $flame);
+	 * }
+	 *
+	 * </code>
+	 *
+	 * @param string $fieldname This is the fieldname to be rendered (e.g. email)
+	 * @param string $value This is the value of the record (e.g. info@atomicon.nl)
+	 * @param string $flame This is the current flame instance
+	 * @return mixed If you override this function give back a string
+	 */
 	function render_cell($fieldname, $value, $flame)
 	{
 		$this->ci->load->helper('text');
@@ -221,20 +330,37 @@ class Flame
 		}
 		return NULL;
 	}
-	
+
+	/**
+	 * Flame::add_message()
+	 *
+	 * @param string $message The message to display
+	 * @param string $type (e.g. info/error/waring)
+	 * @param bool $flash //if true it will be kept by the session
+	 * @return void
+	 */
 	function add_message($message, $type = 'info', $flash = FALSE)
 	{
 		$this->messages[] = array(
 			'message' => $message,
 			'type'    => $type,
 		);
-						
+
 		if ($flash && isset($this->ci->session))
 		{
-			$this->ci->session->set_userdata('flame-messages', $this->messages);			
-		}		
+			$this->ci->session->set_userdata('flame-messages', $this->messages);
+		}
 	}
 
+	/**
+	 * Flame::_fetch_rows()
+	 *
+	 * This function is called by page()
+	 * And fetches all rows depending on sorting and pagination
+	 *
+	 * @param array $rows (reference variable)
+	 * @return void
+	 */
 	function _fetch_rows(&$rows)
 	{
 		$rows      = $this->config['rows'];
@@ -262,6 +388,13 @@ class Flame
 		$rows = is_array($rows) ? $rows : array();
 	}
 
+	/**
+	 * Flame::_current_page()
+	 *
+	 * Called by page() and returns the current page the user is on
+	 *
+	 * @return integer
+	 */
 	function _current_page()
 	{
 		$cur_page = (int)$this->ci->uri->segment($this->config['uri_segment']+1);
@@ -269,6 +402,14 @@ class Flame
 		return $cur_page;
 	}
 
+	/**
+	 * Flame::_prepare_rows()
+	 *
+	 * Called by page() and fetches all rows depending on and fills the table
+	 *
+	 * @param array $rows (reference variable)
+	 * @return void
+	 */
 	function _prepare_rows(&$rows)
 	{
 		$new_rows = array();
@@ -314,13 +455,21 @@ class Flame
 		$rows = $new_rows;
 	}
 
+	/**
+	 * Flame::_prepare_heading()
+	 *
+	 * Called by page, created nice sorting links (if enabled) for the page display
+	 *
+	 * @param array $heading (referencing variable)
+	 * @return void
+	 */
 	function _prepare_heading(&$heading)
 	{
 		$sort_name = $this->_sort_name();
 		$sort_dir  = $this->_sort_dir();
 
 		$heading = array_keys($this->config['fields']);
-		
+
 		if ($this->config['sorting'] && isset($this->ci->session))
 		{
 			foreach($heading as &$label)
@@ -342,6 +491,14 @@ class Flame
 		}
 	}
 
+	/**
+	 * Flame::_form()
+	 *
+	 * This function renders the form and is called by create() and edit()
+	 *
+	 * @param mixed $id (primary key of the table or null for create mode)
+	 * @return string the rendered HTML
+	 */
 	function _form($id = null)
 	{
 		$result = '';
@@ -401,7 +558,7 @@ class Flame
 			foreach($errors as $error)
 			{
 				$this->add_message($error, 'error');
-			}			
+			}
 		}
 
 		$values = array();
@@ -427,7 +584,7 @@ class Flame
   				}
   			}
   		}
-		
+
 		$result .= $this->_show_messages();
 
   		if ($this->config['form_open'])
@@ -495,12 +652,19 @@ class Flame
 			}
 			$result = '<div class="page-header">' . heading($title, 1) . '</div>' . $result . '</div>';
 		}
-		
-		$result = "<div class=\"flame flame-form\">\n{$result}\n</div>";		
+
+		$result = "<div class=\"flame flame-form\">\n{$result}\n</div>";
 
 		return $result;
 	}
-	
+
+	/**
+	 * Flame::_show_messages()
+	 *
+	 * Called by all actions. Displays the messages
+	 *
+	 * @return string A message list based on the template in the config
+	 */
 	function _show_messages()
 	{
 		$result = '';
@@ -516,6 +680,14 @@ class Flame
 	}
 
 
+	/**
+	 * Flame::_translate_fields()
+	 *
+	 * This function tries to map the type of record-variables
+	 * in SQL to form values (e.g. VARCHAR = input type text, etc)
+	 *
+	 * @return
+	 */
 	function _translate_fields()
 	{
 		$primary_key = null;
@@ -598,15 +770,37 @@ class Flame
 		}
 	}
 
+	/**
+	 * Flame::_base_url()
+	 *
+	 * This function gives back the current controller + function (that is where flame resides)
+	 *
+	 * @return string The base url relative to the current flame
+	 */
 	function _base_url()
 	{
 		return rtrim(site_url($this->ci->router->fetch_class().'/'.$this->ci->router->fetch_method()), '/').'/';
 	}
 
+	/**
+	 * Flame::_sort_name()
+	 *
+	 * The current sorting name or FALSE if sorting is disabled
+	 *
+	 * @return string or boolean
+	 */
 	function _sort_name()
-	{		
+	{
 		return isset($this->ci->session) ? $this->ci->session->userdata($this->_base_url().'sort_name') : FALSE;
 	}
+	/**
+	 * Flame::_set_sort_name()
+	 *
+	 * Sets the sorting by name if sorting is enabled
+	 *
+	 * @param string $name The name mapping to the database field
+	 * @return
+	 */
 	function _set_sort_name($name)
 	{
 		if (isset($this->ci->session))
@@ -614,10 +808,25 @@ class Flame
 			$this->ci->session->set_userdata($this->_base_url().'sort_name', $name);
 		}
 	}
+	/**
+	 * Flame::_sort_dir()
+	 *
+	 * The current sorting direction or FALSE if sorting is disabled
+	 *
+	 * @return
+	 */
 	function _sort_dir()
 	{
 		return isset($this->ci->session) ? $this->ci->session->userdata($this->_base_url().'sort_dir') : FALSE;
 	}
+	/**
+	 * Flame::_set_sort_dir()
+	 *
+	 * Sets the current sorting direction or FALSE if sorting is disabled
+	 *
+	 * @param mixed $dir
+	 * @return
+	 */
 	function _set_sort_dir($dir)
 	{
 		if (isset($this->ci->session))
