@@ -12,13 +12,12 @@ How to use in it's basic form
 - Create a standard 'users' table in mysql with an id, username, email etc.
 - In the initialize function point the table to 'users'
 
-Example code basic example:
+Example code (basic):
 
 	<?php
 
 	class Admin extends CI_Controller
 	{
-
 		function users()
 		{
 			//load the libraries
@@ -41,3 +40,6 @@ Example code basic example:
 			$flame->display(FALSE);
 		}
 	}
+
+Now you can access the the url via (e.g.) http://localhost/ci_dev/admin/users (and the flame will pick it up from there)
+Also note: I used the standard markup from [Twitter Bootstrap](http://twitter.github.com/bootstrap/ "Twitter Bootstrap")
