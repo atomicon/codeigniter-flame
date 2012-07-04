@@ -36,6 +36,12 @@ $config['show_messages'] = TRUE;
 // Callbacks
 $config['render_cell'] = NULL;
 
+$config['before_update'] = NULL;
+$config['after_update']  = NULL;
+
+$config['before_insert'] = NULL;
+$config['after_insert']  = NULL;
+
 // Labels for buttons etc.
 $config['labels'] = array(
 	'actions' => '#',
