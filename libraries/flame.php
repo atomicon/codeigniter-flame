@@ -1,15 +1,24 @@
 <?php
 
-if (!function_exists('_T')) {
+if (!function_exists('__'))
+{
 	/**
-	 * _T()
-	 * The _T function is actually for i18n
-	 * Create your own _T function and return the translations for translateable strings
+	 * __()
 	 *
-	 * @param string $str
-	 * @return string
+	 * This is a mimic of the i18n __ wordpress function
+	 *
+	 * @param string $string The string to translate
+	 * @return string The translated string
 	 */
-	function _T($str = '') { return $str; }
+	function __($string)
+	{
+		$translated = FALSE;
+		if (function_exists('lang'))
+		{
+			$translated = lang($string);
+		}
+		return $translated ? $translated : $string;
+	}
 }
 
 class Flame
@@ -196,12 +205,7 @@ class Flame
 			</div>
 			';
 		}
-
-		if ($this->config['page_title'])
-		{
-			$result .= '</div>';
-		}
-
+		
 		$result = "<div class=\"flame flame-page\">\n{$result}\n</div>";
 
 		return $result;
@@ -554,10 +558,18 @@ class Flame
 		}
 		else
 		{
-			$errors = (array)$this->ci->form_validation->error_array();
+            $this->ci->form_validation->set_error_delimiters('', '|');
+            
+			$errors = explode('|', validation_errors());
+            
+            $this->ci->form_validation->set_error_delimiters('<p>', '</p>');
+
 			foreach($errors as $error)
 			{
-				$this->add_message($error, 'error');
+                if ($error!='')
+                {
+                    $this->add_message($error, 'error');
+                }
 			}
 		}
 
@@ -650,7 +662,7 @@ class Flame
 			{
 				$title = $this->config['page_title'];
 			}
-			$result = '<div class="page-header">' . heading($title, 1) . '</div>' . $result . '</div>';
+			$result = '<div class="page-header">' . heading($title, 1) . '</div>' . $result;
 		}
 
 		$result = "<div class=\"flame flame-form\">\n{$result}\n</div>";
