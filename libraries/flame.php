@@ -47,6 +47,21 @@ class Flame
 		}
 		$this->messages = is_array($this->messages) ? $this->messages : array();
 	}
+    
+    /**
+	 * Flame::set_uri_segment()
+	 *
+	 * This is an important function for the 'action' function below	 
+	 * is the action(e.g. /admin/users/edit (edit is the action) )
+	 *
+	 * @param integer $segment (default = 3)
+	 * @return void
+	 */
+    
+    function set_uri_segment($segment = 3)
+    {
+        $this->config['uri_segment'] = $segment;
+    }
 
 	/**
 	 * Flame::initialize()
@@ -68,7 +83,7 @@ class Flame
 			$this->config['render_cell'] = array($this, 'render_cell');
 		}
 	}
-
+        
 	/**
 	 * Flame::action()
 	 *
@@ -538,19 +553,37 @@ class Flame
 					$data[$name] = $value;
 				}
 			}
-
+                        
 			if ($id !== NULL)
-			{
+			{    
+                if (is_callable($this->config['before_update']))
+                {
+                    $data = call_user_func_array($this->config['before_update'], $data);
+                }
+
 				if ($this->ci->db->update($this->config['table'], $data, array($this->config['primary_key'] => $id) ))
 				{
+                    if (is_callable($this->config['after_update']))
+                    {
+                        $data = call_user_func_array($this->config['after_update'], $data);
+                    }
 					$this->add_message('Item updated', 'success', TRUE);
      				redirect( $this->_base_url() . $suffix );
 				}
 			}
 			else
 			{
+                if (is_callable($this->config['before_insert']))
+                {
+                    $data = call_user_func_array($this->config['before_insert'], $data);
+                }
+
 				if ($this->ci->db->insert($this->config['table'], $data))
 				{
+                    if (is_callable($this->config['after_insert']))
+                    {
+                        $data = call_user_func_array($this->config['after_insert'], $data);
+                    }
 					$this->add_message('Item created', 'success', TRUE);
      				redirect( $this->_base_url() . $suffix );
 				}
@@ -566,7 +599,7 @@ class Flame
 
 			foreach($errors as $error)
 			{
-                if ($error!='')
+                if (trim($error)!='')
                 {
                     $this->add_message($error, 'error');
                 }
@@ -791,7 +824,11 @@ class Flame
 	 */
 	function _base_url()
 	{
-		return rtrim(site_url($this->ci->router->fetch_class().'/'.$this->ci->router->fetch_method()), '/').'/';
+        if ($this->config['uri_segment'] < 3)
+        {
+            return rtrim(site_url($this->ci->router->fetch_class().'/'), '/').'/';            
+        }
+        return rtrim(site_url($this->ci->router->fetch_class().'/'.$this->ci->router->fetch_method()), '/').'/';
 	}
 
 	/**
