@@ -113,7 +113,7 @@ class Flame
 			}
 			else
 			{
-				show_error( sprintf(_T("Unknown action: '%s'"), $action) );
+				show_error( sprintf(__("Unknown action: '%s'"), $action) );
 			}
 		}
 
@@ -188,7 +188,7 @@ class Flame
 		{
 			if ($this->config['page_title']===TRUE)
 			{
-				$title = _T( plural(humanize($this->config['table'])) );
+				$title = __( plural(humanize($this->config['table'])) );
 			}
 			else
 			{
@@ -201,7 +201,7 @@ class Flame
 		{
 			$result .= '
 			<div class="form-actions">
-				'.anchor( $this->_base_url().'create', _T($this->config['labels']['create']), 'class="btn btn-primary"' ).'
+				'.anchor( $this->_base_url().'create', __($this->config['labels']['create']), 'class="btn btn-primary"' ).'
 			</div>
 			';
 		}
@@ -480,12 +480,12 @@ class Flame
 			{
 				if ($sort_name == $label)
 				{
-					$label = anchor( $this->_base_url().'sort/'.$label.'/'.($sort_dir == 'desc' ? 'asc' : 'desc'), _T($label), 'class="sort-active sort-'.$sort_dir.'"');
+					$label = anchor( $this->_base_url().'sort/'.$label.'/'.($sort_dir == 'desc' ? 'asc' : 'desc'), __($label), 'class="sort-active sort-'.$sort_dir.'"');
 				}
 				else
 				{
 					//not active... always asc
-					$label = anchor( $this->_base_url().'sort/'.$label, _T($label));
+					$label = anchor( $this->_base_url().'sort/'.$label, __($label));
 				}
 			}
 		}
@@ -640,8 +640,8 @@ class Flame
 		{
 			$result .= '
 			<div class="form-actions">
-				'.anchor( $this->_base_url().$suffix, _T($this->config['labels']['cancel']), 'class="btn"' ).'
-				'.form_submit('flame-action', _T( $id === null ? $this->config['labels']['create'] : $this->config['labels']['save']), 'class="btn btn-primary"').'
+				'.anchor( $this->_base_url().$suffix, __($this->config['labels']['cancel']), 'class="btn"' ).'
+				'.form_submit('flame-action', __( $id === null ? $this->config['labels']['create'] : $this->config['labels']['save']), 'class="btn btn-primary"').'
 			</div>
 			';
 		}
@@ -655,8 +655,8 @@ class Flame
 		{
 			if ($this->config['page_title']===TRUE)
 			{
-				$title = $id === null ? _T($this->config['labels']['create']) : _T($this->config['labels']['edit']);
-				$title .= ' ' . _T(singular( humanize($this->config['table'])));
+				$title = $id === null ? __($this->config['labels']['create']) : __($this->config['labels']['edit']);
+				$title .= ' ' . __(singular( humanize($this->config['table'])));
 			}
 			else
 			{
@@ -715,7 +715,7 @@ class Flame
 		{
 			$definition = array(
 				'name'  => $row['Field'],
-				'label' => _T(humanize($row['Field'])),
+				'label' => __(humanize($row['Field'])),
 				'type'  => 'text',
 				'value' => $row['Default'],
 				'rules' => '',
