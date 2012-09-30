@@ -493,14 +493,23 @@ class Flame
 		{
 			foreach($heading as &$label)
 			{
-				if ($sort_name == $label)
+				$definition = $this->config['fields'][$label];
+
+				if (isset($definition['db']) && !empty($definition['db']))
 				{
-					$label = anchor( $this->_base_url().'sort/'.$label.'/'.($sort_dir == 'desc' ? 'asc' : 'desc'), __($label), 'class="sort-active sort-'.$sort_dir.'"');
+					if ($sort_name == $label)
+					{
+						$label = anchor( $this->_base_url().'sort/'.$label.'/'.($sort_dir == 'desc' ? 'asc' : 'desc'), $definition['label'], 'class="sort-active sort-'.$sort_dir.'"');
+					}
+					else
+					{
+						//not active... always asc
+						$label = anchor( $this->_base_url().'sort/'.$label, $definition['label']);
+					}
 				}
 				else
 				{
-					//not active... always asc
-					$label = anchor( $this->_base_url().'sort/'.$label, __($label));
+					$label = $definition['label'];
 				}
 			}
 		}
