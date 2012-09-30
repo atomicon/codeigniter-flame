@@ -47,17 +47,17 @@ class Flame
 		}
 		$this->messages = is_array($this->messages) ? $this->messages : array();
 	}
-    
+
     /**
 	 * Flame::set_uri_segment()
 	 *
-	 * This is an important function for the 'action' function below	 
+	 * This is an important function for the 'action' function below
 	 * is the action(e.g. /admin/users/edit (edit is the action) )
 	 *
 	 * @param integer $segment (default = 3)
 	 * @return void
 	 */
-    
+
     function set_uri_segment($segment = 3)
     {
         $this->config['uri_segment'] = $segment;
@@ -83,7 +83,7 @@ class Flame
 			$this->config['render_cell'] = array($this, 'render_cell');
 		}
 	}
-        
+
 	/**
 	 * Flame::action()
 	 *
@@ -220,7 +220,7 @@ class Flame
 			</div>
 			';
 		}
-		
+
 		$result = "<div class=\"flame flame-page\">\n{$result}\n</div>";
 
 		return $result;
@@ -553,9 +553,9 @@ class Flame
 					$data[$name] = $value;
 				}
 			}
-                        
+
 			if ($id !== NULL)
-			{    
+			{
                 if (is_callable($this->config['before_update']))
                 {
                     $data = call_user_func_array($this->config['before_update'], $data);
@@ -592,9 +592,9 @@ class Flame
 		else
 		{
             $this->ci->form_validation->set_error_delimiters('', '|');
-            
+
 			$errors = explode('|', validation_errors());
-            
+
             $this->ci->form_validation->set_error_delimiters('<p>', '</p>');
 
 			foreach($errors as $error)
@@ -803,8 +803,20 @@ class Flame
 					{
 						$newfields[$fieldname] = $fields[$fieldname];
 					}
+					else
+					{
+						$newfields[$fieldname] = array(
+							'name'  => $fieldname,
+							'label' => __(humanize($fieldname)),
+							'type'  => 'text',
+							'value' => '',
+							'rules' => '',
+							'db'    => array(),
+						);
+					}
 				}
 				$fields = $newfields;
+
 				$this->config['fields'] = $fields;
 			}
 		}
@@ -826,7 +838,7 @@ class Flame
 	{
         if ($this->config['uri_segment'] < 3)
         {
-            return rtrim(site_url($this->ci->router->fetch_class().'/'), '/').'/';            
+            return rtrim(site_url($this->ci->router->fetch_class().'/'), '/').'/';
         }
         return rtrim(site_url($this->ci->router->fetch_class().'/'.$this->ci->router->fetch_method()), '/').'/';
 	}
